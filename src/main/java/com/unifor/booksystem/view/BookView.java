@@ -1,46 +1,49 @@
-// Define o pacote da camada de visão.
 package com.unifor.booksystem.view;
 
+import com.unifor.booksystem.controller.BookController;
 import com.unifor.booksystem.model.Book;
-import java.util.Scanner; // Importa a classe Scanner, conforme solicitado[cite: 34].
+import java.util.Scanner;
 
 /**
- * View: Responsável pela interação com o usuário (entrada e saída de dados no console).
- * Não contém nenhuma regra de negócio.
- * Fonte: [cite: 7, 150]
+ * View: Ponto de entrada da aplicação e camada de interação com o usuário.
+ * Inicia o fluxo, coleta os dados e os envia para o Controller.
  */
 public class BookView {
+    private BookController controller;
     private Scanner scanner;
 
     public BookView() {
+        // A View agora cria sua instância do Controller, estabelecendo a conexão.
+        this.controller = new BookController(this);
         this.scanner = new Scanner(System.in);
     }
+    
+    /**
+     * Método que inicia a interação com o usuário.
+     * Ela mesma gerencia a coleta de todos os dados antes de acionar o Controller.
+     */
+    public void start() {
+        System.out.println("--- Sistema de Registro de Livros ---");
 
-    // Método para solicitar o título e retornar a entrada do usuário.
-    public String getBookTitleInput() {
         System.out.print("Digite o título do livro: ");
-        return scanner.nextLine();
-    }
+        String title = scanner.nextLine();
 
-    // Método para solicitar o autor e retornar a entrada do usuário.
-    public String getBookAuthorInput() {
         System.out.print("Digite o autor do livro: ");
-        return scanner.nextLine();
-    }
+        String author = scanner.nextLine();
 
-    // Método para solicitar o ano e retornar a entrada do usuário.
-    public int getBookYearInput() {
         System.out.print("Digite o ano de publicação: ");
-        // Tratamento básico de erro para garantir que um número seja inserido.
-        while (!scanner.hasNextInt()) {
-            System.out.println("Entrada inválida. Por favor, digite um número para o ano.");
-            scanner.next(); // Descarta a entrada inválida.
-            System.out.print("Digite o ano de publicação: ");
-        }
-        return scanner.nextInt();
-    }
+        int year = scanner.nextInt();
 
-    // Método para exibir os detalhes do livro formatados no console[cite: 24].
+        // Após coletar todos os dados, a View aciona o Controller.
+        controller.registerBook(title, author, year);
+        
+        scanner.close();
+    }
+    
+    /**
+     * Exibe os detalhes do livro. Este método é chamado pelo Controller
+     * ao final do processo de registro.
+     */
     public void displayBookDetails(Book book) {
         System.out.println("\n--- Livro Registrado com Sucesso ---");
         System.out.println("Título: " + book.getTitle());
@@ -49,8 +52,12 @@ public class BookView {
         System.out.println("------------------------------------");
     }
 
-    // Fecha o scanner para liberar recursos.
-    public void closeScanner() {
-        scanner.close();
+    /**
+     * Ponto de entrada da aplicação.
+     * A responsabilidade de iniciar o sistema agora é da própria View.
+     */
+    public static void main(String[] args) {
+        BookView view = new BookView();
+        view.start();
     }
 }
